@@ -8,17 +8,22 @@ class FootballApp:
         self.root = root
         self.root.title("Tabla de posiciones y goleadores")
         self.root.geometry("400x200")
+        
         self.upload_button = tk.Button(self.root, text="Cargar archivo Excel", command=self.upload_file)
         self.upload_button.pack(pady=20)
+        
         self.generate_button = tk.Button(self.root, text="Generar tabla de posiciones", command=self.generate_table)
         self.generate_button.pack(pady=20)
+        
         self.file_path = None
         self.data = None
+
     def upload_file(self):
         self.file_path = filedialog.askopenfilename(title="Selecciona el archivo Excel", filetypes=[("Excel files", "*.xlsx")])
         if self.file_path:
             self.data = pd.read_excel(self.file_path)
             messagebox.showinfo("Cargado", "Archivo cargado correctamente")
+
     def generate_table(self):
         if self.data is None:
             messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
@@ -53,6 +58,7 @@ class FootballApp:
 
         # Mostrar tablas
         self.show_tables(table_positions, table_scorers)
+
     def update_table(self, team, points, goals_for, goals_against, table):
         if team not in table:
             table[team] = {'Puntos': 0, 'Goles a favor': 0, 'Goles en contra': 0, 'Partidos': 0}
@@ -61,6 +67,7 @@ class FootballApp:
         table[team]['Goles a favor'] += goals_for
         table[team]['Goles en contra'] += goals_against
         table[team]['Partidos'] += 1
+
     def update_scorers(self, scorers, table_scorers):
         for scorer in scorers:
             scorer = scorer.strip()
@@ -68,6 +75,7 @@ class FootballApp:
                 if scorer not in table_scorers:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
+
     def show_tables(self, table_positions, table_scorers):
         print("Tabla de posiciones:")
         for team, stats in sorted(table_positions.items(), key=lambda x: (-x[1]['Puntos'], -x[1]['Goles a favor'])):
@@ -76,3 +84,8 @@ class FootballApp:
         print("\nTabla de goleadores:")
         for scorer, goals in sorted(table_scorers.items(), key=lambda x: -x[1]):
             print(f"{scorer}: {goals} goles")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = FootballApp(root)
+    root.mainloop()
