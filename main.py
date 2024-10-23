@@ -63,3 +63,4 @@ class FootballApp:
         table[team]['Partidos'] += 1
     def update_scorers(self, scorers, table_scorers):
         for scorer in scorers:
+            scorer = scorer.strip()
