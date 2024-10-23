@@ -67,3 +67,4 @@ class FootballApp:
             if scorer:
                 if scorer not in table_scorers:
                     table_scorers[scorer] = 0
+                table_scorers[scorer] += 1
