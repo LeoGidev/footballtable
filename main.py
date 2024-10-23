@@ -14,3 +14,8 @@ class FootballApp:
         self.generate_button.pack(pady=20)
         self.file_path = None
         self.data = None
+    def upload_file(self):
+        self.file_path = filedialog.askopenfilename(title="Selecciona el archivo Excel", filetypes=[("Excel files", "*.xlsx")])
+        if self.file_path:
+            self.data = pd.read_excel(self.file_path)
+            messagebox.showinfo("Cargado", "Archivo cargado correctamente")
