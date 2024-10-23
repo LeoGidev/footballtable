@@ -62,3 +62,4 @@ class FootballApp:
         table[team]['Goles en contra'] += goals_against
         table[team]['Partidos'] += 1
     def update_scorers(self, scorers, table_scorers):
+        for scorer in scorers:
