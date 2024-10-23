@@ -68,3 +68,11 @@ class FootballApp:
                 if scorer not in table_scorers:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
+    def show_tables(self, table_positions, table_scorers):
+        print("Tabla de posiciones:")
+        for team, stats in sorted(table_positions.items(), key=lambda x: (-x[1]['Puntos'], -x[1]['Goles a favor'])):
+            print(f"{team}: {stats['Puntos']} puntos, {stats['Goles a favor']} GF, {stats['Goles en contra']} GC, {stats['Partidos']} PJ")
+        
+        print("\nTabla de goleadores:")
+        for scorer, goals in sorted(table_scorers.items(), key=lambda x: -x[1]):
+            print(f"{scorer}: {goals} goles")
