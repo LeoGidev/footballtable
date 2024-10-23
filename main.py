@@ -1,20 +1,31 @@
 import pandas as pd
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 from openpyxl import load_workbook
-import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image, ImageTk
+import os
 
 class FootballApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Tabla de posiciones y goleadores")
-        self.root.geometry("400x200")
+        self.root.geometry("500x300")
+        self.root.configure(bg="#2E4053")
+
+        # Estilos personalizados
+        style = ttk.Style()
+        style.configure('TButton', font=('Helvetica', 12), padding=10)
+        style.configure('TLabel', font=('Helvetica', 12), foreground="#ECF0F1", background="#2E4053")
+
+        self.upload_button = ttk.Button(self.root, text="Cargar archivo Excel", command=self.upload_file)
+        self.upload_button.pack(pady=10)
         
-        self.upload_button = tk.Button(self.root, text="Cargar archivo Excel", command=self.upload_file)
-        self.upload_button.pack(pady=20)
-        
-        self.generate_button = tk.Button(self.root, text="Generar tabla de posiciones", command=self.generate_table)
-        self.generate_button.pack(pady=20)
+        self.generate_button = ttk.Button(self.root, text="Generar tablas e imágenes", command=self.generate_table)
+        self.generate_button.pack(pady=10)
+
+        self.status_label = ttk.Label(self.root, text="")
+        self.status_label.pack(pady=20)
         
         self.file_path = None
         self.data = None
@@ -24,13 +35,13 @@ class FootballApp:
         if self.file_path:
             self.data = pd.read_excel(self.file_path)
             messagebox.showinfo("Cargado", "Archivo cargado correctamente")
+            self.status_label.config(text="Archivo cargado: " + os.path.basename(self.file_path))
 
     def generate_table(self):
         if self.data is None:
             messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
             return
 
-        # Asume que las columnas son: Equipo_local, Equipo_visitante, Goles_local, Goles_visitante, Goleadores_local, Goleadores_visitante
         table_positions = {}
         table_scorers = {}
 
@@ -40,7 +51,6 @@ class FootballApp:
             local_goals = row['Goles_local']
             visit_goals = row['Goles_visitante']
 
-            # Calcular puntos
             if local_goals > visit_goals:
                 self.update_table(local_team, 3, local_goals, visit_goals, table_positions)
                 self.update_table(visit_team, 0, visit_goals, local_goals, table_positions)
@@ -51,18 +61,19 @@ class FootballApp:
                 self.update_table(local_team, 1, local_goals, visit_goals, table_positions)
                 self.update_table(visit_team, 1, visit_goals, local_goals, table_positions)
 
-            # Verificar si las columnas de goleadores tienen valores válidos
             local_scorers = self.get_scorers(row['Goleadores_local'])
             visit_scorers = self.get_scorers(row['Goleadores_visitante'])
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
 
-        # Mostrar tablas
-        self.show_tables(table_positions, table_scorers)
+        # Generar imágenes
+        self.generate_image("Tabla de Posiciones", table_positions, "posiciones.png")
+        self.generate_image("Tabla de Goleadores", table_scorers, "goleadores.png")
+
+        messagebox.showinfo("Éxito", "Tablas generadas y guardadas como imágenes")
 
     def get_scorers(self, scorers_cell):
-        """Retorna una lista de goleadores si la celda tiene un valor válido, de lo contrario retorna una lista vacía."""
-        if pd.isna(scorers_cell):  # Verificar si la celda está vacía (NaN)
+        if pd.isna(scorers_cell):
             return []
         return scorers_cell.split(',')
 
@@ -83,17 +94,31 @@ class FootballApp:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
 
-    def show_tables(self, table_positions, table_scorers):
-        print("Tabla de posiciones:")
-        for team, stats in sorted(table_positions.items(), key=lambda x: (-x[1]['Puntos'], -x[1]['Goles a favor'])):
-            print(f"{team}: {stats['Puntos']} puntos, {stats['Goles a favor']} GF, {stats['Goles en contra']} GC, {stats['Partidos']} PJ")
-        
-        print("\nTabla de goleadores:")
-        for scorer, goals in sorted(table_scorers.items(), key=lambda x: -x[1]):
-            print(f"{scorer}: {goals} goles")
+    def generate_image(self, title, table, filename):
+        fig, ax = plt.subplots()
+
+        if title == "Tabla de Posiciones":
+            data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
+            columns = ["Equipo", "Puntos", "Goles a favor", "Goles en contra", "Partidos"]
+        else:
+            data = [(scorer, goals) for scorer, goals in table.items()]
+            columns = ["Goleador", "Goles"]
+
+        # Crear tabla visual con matplotlib
+        ax.axis('tight')
+        ax.axis('off')
+        ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
+
+        # Guardar la imagen
+        plt.title(title, fontsize=16)
+        plt.savefig(filename, bbox_inches='tight')
+        plt.close()
+
+        self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = FootballApp(root)
     root.mainloop()
+
 
