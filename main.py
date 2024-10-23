@@ -19,3 +19,7 @@ class FootballApp:
         if self.file_path:
             self.data = pd.read_excel(self.file_path)
             messagebox.showinfo("Cargado", "Archivo cargado correctamente")
+    def generate_table(self):
+        if self.data is None:
+            messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
+            return
