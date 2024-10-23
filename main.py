@@ -53,3 +53,11 @@ class FootballApp:
 
         # Mostrar tablas
         self.show_tables(table_positions, table_scorers)
+    def update_table(self, team, points, goals_for, goals_against, table):
+        if team not in table:
+            table[team] = {'Puntos': 0, 'Goles a favor': 0, 'Goles en contra': 0, 'Partidos': 0}
+        
+        table[team]['Puntos'] += points
+        table[team]['Goles a favor'] += goals_for
+        table[team]['Goles en contra'] += goals_against
+        table[team]['Partidos'] += 1
