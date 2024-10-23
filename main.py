@@ -42,3 +42,8 @@ class FootballApp:
             else:
                 self.update_table(local_team, 1, local_goals, visit_goals, table_positions)
                 self.update_table(visit_team, 1, visit_goals, local_goals, table_positions)
+            # Calcular goleadores (asume que los goleadores están separados por comas)
+            local_scorers = row['Goleadores_local'].split(',')
+            visit_scorers = row['Goleadores_visitante'].split(',')
+            self.update_scorers(local_scorers, table_scorers)
+            self.update_scorers(visit_scorers, table_scorers)
