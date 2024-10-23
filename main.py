@@ -23,3 +23,7 @@ class FootballApp:
         if self.data is None:
             messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
             return
+
+        # Asume que las columnas son: Equipo_local, Equipo_visitante, Goles_local, Goles_visitante, Goleadores_local, Goleadores_visitante
+        table_positions = {}
+        table_scorers = {}
