@@ -65,3 +65,5 @@ class FootballApp:
         for scorer in scorers:
             scorer = scorer.strip()
             if scorer:
+                if scorer not in table_scorers:
+                    table_scorers[scorer] = 0
