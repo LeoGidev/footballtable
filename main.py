@@ -27,3 +27,18 @@ class FootballApp:
         # Asume que las columnas son: Equipo_local, Equipo_visitante, Goles_local, Goles_visitante, Goleadores_local, Goleadores_visitante
         table_positions = {}
         table_scorers = {}
+        for index, row in self.data.iterrows():
+            local_team = row['Equipo_local']
+            visit_team = row['Equipo_visitante']
+            local_goals = row['Goles_local']
+            visit_goals = row['Goles_visitante']
+            # Calcular puntos
+            if local_goals > visit_goals:
+                self.update_table(local_team, 3, local_goals, visit_goals, table_positions)
+                self.update_table(visit_team, 0, visit_goals, local_goals, table_positions)
+            elif local_goals < visit_goals:
+                self.update_table(local_team, 0, local_goals, visit_goals, table_positions)
+                self.update_table(visit_team, 3, visit_goals, local_goals, table_positions)
+            else:
+                self.update_table(local_team, 1, local_goals, visit_goals, table_positions)
+                self.update_table(visit_team, 1, visit_goals, local_goals, table_positions)
