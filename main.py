@@ -2,6 +2,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from openpyxl import load_workbook
+import numpy as np
 
 class FootballApp:
     def __init__(self, root):
@@ -50,14 +51,20 @@ class FootballApp:
                 self.update_table(local_team, 1, local_goals, visit_goals, table_positions)
                 self.update_table(visit_team, 1, visit_goals, local_goals, table_positions)
 
-            # Calcular goleadores (asume que los goleadores están separados por comas)
-            local_scorers = row['Goleadores_local'].split(',')
-            visit_scorers = row['Goleadores_visitante'].split(',')
+            # Verificar si las columnas de goleadores tienen valores válidos
+            local_scorers = self.get_scorers(row['Goleadores_local'])
+            visit_scorers = self.get_scorers(row['Goleadores_visitante'])
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
 
         # Mostrar tablas
         self.show_tables(table_positions, table_scorers)
+
+    def get_scorers(self, scorers_cell):
+        """Retorna una lista de goleadores si la celda tiene un valor válido, de lo contrario retorna una lista vacía."""
+        if pd.isna(scorers_cell):  # Verificar si la celda está vacía (NaN)
+            return []
+        return scorers_cell.split(',')
 
     def update_table(self, team, points, goals_for, goals_against, table):
         if team not in table:
@@ -89,3 +96,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FootballApp(root)
     root.mainloop()
+
