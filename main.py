@@ -74,6 +74,10 @@ class FootballApp:
             self.update_scorers(visit_scorers, table_scorers)
          # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
         if self.background_image:
+            # Convertir la imagen de fondo para que coincida con el tamaño de la figura
+            fig_width, fig_height = fig.get_size_inches() * fig.dpi
+            bg_image_resized = self.background_image.resize((int(fig_width), int(fig_height)))
+           
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
