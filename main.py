@@ -37,6 +37,8 @@ class FootballApp:
             messagebox.showinfo("Cargado", "Archivo cargado correctamente")
             self.status_label.config(text="Archivo cargado: " + os.path.basename(self.file_path))
 
+     def select_background_image(self):
+
     def generate_table(self):
         if self.data is None:
             messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
