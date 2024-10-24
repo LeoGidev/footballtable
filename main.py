@@ -77,7 +77,8 @@ class FootballApp:
             # Convertir la imagen de fondo para que coincida con el tamaño de la figura
             fig_width, fig_height = fig.get_size_inches() * fig.dpi
             bg_image_resized = self.background_image.resize((int(fig_width), int(fig_height)))
-           
+            ax.imshow(bg_image_resized, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)  # Colocar imagen de fondo
+
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
