@@ -143,11 +143,11 @@ class FootballApp:
         table_plot.set_fontsize(10 if mobile else 12)  # Tamaño de la fuente, menor en móviles
         table_plot.scale(1, 1.5 if not mobile else 1.2)  # Escalar altura de las filas, ajustada para móvil
 
-        # Aplicar padding a las celdas y ajustar el diseño
+        # Aplicar bordes y formato a las celdas
         for key, cell in table_plot.get_celld().items():
             cell.set_edgecolor("black")  # Color de borde
             cell.set_linewidth(1.5)      # Grosor de los bordes
-            cell.set_pad(8 if mobile else 10)  # Padding, menor en móviles
+            cell.set_aa(True)            # Mejora de antialiasing (si es aplicable)
 
         # Guardar la imagen con ajustes
         plt.title(title, fontsize=14 if mobile else 16)
@@ -155,6 +155,7 @@ class FootballApp:
         plt.close()
 
         self.status_label.config(text=f"Imágenes guardadas: posiciones_movil.png, goleadores_movil.png")
+
 
 
 
