@@ -11,13 +11,12 @@ class FootballApp:
         self.root = root
         self.root.title("Tabla de posiciones y goleadores")
         self.root.geometry("500x300")
-        self.root.configure(bg="#1C2833")
+        self.root.configure(bg="#2E4053")
 
         # Estilos personalizados
         style = ttk.Style()
-        style.theme_use('clam')  # Puedes probar otros temas también
-        style.configure('TButton', font=('Helvetica', 12), padding=10, background="#2980B9", foreground="#ECF0F1")
-        style.configure('TLabel', font=('Helvetica', 12), foreground="#ECF0F1", background="#1C2833")
+        style.configure('TButton', font=('Helvetica', 12), padding=10)
+        style.configure('TLabel', font=('Helvetica', 12), foreground="#ECF0F1", background="#2E4053")
 
         self.upload_button = ttk.Button(self.root, text="Cargar archivo Excel", command=self.upload_file)
         self.upload_button.pack(pady=10)
@@ -67,9 +66,15 @@ class FootballApp:
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
 
+        # Ordenar tabla de posiciones por puntos (de mayor a menor)
+        sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
+
+        # Ordenar tabla de goleadores por goles (de mayor a menor)
+        sorted_scorers = dict(sorted(table_scorers.items(), key=lambda item: item[1], reverse=True))
+
         # Generar imágenes
-        self.generate_image("Tabla de Posiciones", table_positions, "posiciones.png")
-        self.generate_image("Tabla de Goleadores", table_scorers, "goleadores.png")
+        self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones.png")
+        self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores.png")
 
         messagebox.showinfo("Éxito", "Tablas generadas y guardadas como imágenes")
 
@@ -96,7 +101,7 @@ class FootballApp:
                 table_scorers[scorer] += 1
 
     def generate_image(self, title, table, filename):
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots()
 
         if title == "Tabla de Posiciones":
             data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
@@ -108,16 +113,11 @@ class FootballApp:
         # Crear tabla visual con matplotlib
         ax.axis('tight')
         ax.axis('off')
-        table_plot = ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
-        
-        # Ajustar estilo de la tabla
-        table_plot.auto_set_font_size(False)
-        table_plot.set_fontsize(12)
-        table_plot.scale(1.2, 1.2)  # Escalar para mejor visibilidad
+        ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
 
         # Guardar la imagen
-        plt.title(title, fontsize=16, color="#34495E")
-        plt.savefig(filename, bbox_inches='tight', dpi=300)
+        plt.title(title, fontsize=16)
+        plt.savefig(filename, bbox_inches='tight')
         plt.close()
 
         self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
@@ -126,5 +126,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FootballApp(root)
     root.mainloop()
+
 
 
