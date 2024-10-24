@@ -66,9 +66,15 @@ class FootballApp:
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
 
+        # Ordenar tabla de posiciones por puntos (de mayor a menor)
+        sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
+
+        # Ordenar tabla de goleadores por goles (de mayor a menor)
+        sorted_scorers = dict(sorted(table_scorers.items(), key=lambda item: item[1], reverse=True))
+
         # Generar imágenes
-        self.generate_image("Tabla de Posiciones", table_positions, "posiciones.png")
-        self.generate_image("Tabla de Goleadores", table_scorers, "goleadores.png")
+        self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones.png")
+        self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores.png")
 
         messagebox.showinfo("Éxito", "Tablas generadas y guardadas como imágenes")
 
@@ -120,5 +126,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FootballApp(root)
     root.mainloop()
+
 
 
