@@ -115,13 +115,12 @@ class FootballApp:
                 table_scorers[scorer] += 1
 
     def generate_image(self, title, table, filename, mobile=False):
-        # Ajustar el tamaño de la imagen dependiendo de si es para móvil o no
-        if mobile:
-            fig_width, fig_height = 6, 10  # Dimensiones optimizadas para pantalla de móvil (720x1280 px aproximadamente)
-            dpi = 150  # DPI adecuado para alta calidad en móviles
-        else:
-            fig_width, fig_height = 10, 8  # Tamaño estándar
-            dpi = 300  # Alta resolución para pantallas grandes
+        
+        
+        fig_width, fig_height = 6, 10  # Dimensiones optimizadas para pantalla de móvil (720x1280 px aproximadamente)
+        dpi = 150  # DPI adecuado para alta calidad en móviles
+        
+            
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
 
@@ -149,7 +148,7 @@ class FootballApp:
         cell_widths = [width * 0.2 for width in column_widths]  # Ajustar el factor según la visualización deseada
 
         # Establecer el alto de las filas
-        cell_height = 0.5  # Ajustar según sea necesario
+        cell_height = 1 # 
 
         table = ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
         
@@ -158,8 +157,8 @@ class FootballApp:
             table.auto_set_column_width(i)
             table[i, 0].set_width(width * 0.1)  # Ajustar ancho (0.1 es un factor que puedes modificar)
 
-        for i in range(len(data)):
-            table[(i + 1, 0)].set_height(cell_height)  # Establecer alto para cada fila
+        #for i in range(len(data)):
+            #table[(i + 1, 0)].set_height(cell_height)  # Establecer alto para cada fila
 
         plt.title(title, fontsize=16)
         plt.savefig(filename, bbox_inches='tight', dpi=dpi)
