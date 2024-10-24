@@ -115,42 +115,47 @@ class FootballApp:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
 
-    def generate_image(self, title, table, filename, mobile=False):
-        # Ajustar el tamaño de la imagen dependiendo de si es para móvil o no
-        if mobile:
-            fig_width, fig_height = 6, 10  # Dimensiones optimizadas para pantalla de móvil (720x1280 px aproximadamente)
-            dpi = 150  # DPI adecuado para alta calidad en móviles
-        else:
-            fig_width, fig_height = 10, 8  # Tamaño estándar
-            dpi = 300  # Alta resolución para pantallas grandes
-
-        fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
+    def generate_image(self, title, table, filename):
+        fig, ax = plt.subplots()
 
         if title == "Tabla de Posiciones":
             data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
             columns = ["Equipo", "Puntos", "Goles a favor", "Goles en contra", "Partidos"]
+
+            # Definir anchos de columnas (basado en el contenido)
+            col_widths = [0.3, 0.1, 0.15, 0.15, 0.1]
         else:
             data = [(scorer, goals) for scorer, goals in table.items()]
             columns = ["Goleador", "Goles"]
 
-        # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
-        if self.background_image:
-            # Convertir la imagen de fondo para que coincida con el tamaño de la figura
-            fig_width_px, fig_height_px = fig.get_size_inches() * fig.dpi
-            bg_image_resized = self.background_image.resize((int(fig_width_px), int(fig_height_px)))
-            ax.imshow(bg_image_resized, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)  # Colocar imagen de fondo
+            # Definir anchos de columnas para goleadores
+            col_widths = [0.6, 0.2]
 
         # Crear tabla visual con matplotlib
         ax.axis('tight')
         ax.axis('off')
-        ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
 
-        # Guardar la imagen optimizada
+        # Crear la tabla con ajuste de columnas y filas
+        table_plot = ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center', colWidths=col_widths)
+
+        # Estilo de la tabla: ajustar el alto de las filas y agregar padding
+        table_plot.auto_set_font_size(False)
+        table_plot.set_fontsize(12)  # Tamaño de la fuente
+        table_plot.scale(1, 1.5)     # Escalar altura de las filas (1.5 aumenta el alto)
+
+        # Aplicar padding a las celdas y ajustar el diseño
+        for key, cell in table_plot.get_celld().items():
+            cell.set_edgecolor("black")  # Color de borde
+            cell.set_linewidth(1.5)      # Grosor de los bordes
+            cell.set_pad(10)             # Padding interno de las celdas
+        
+        # Guardar la imagen con ajustes
         plt.title(title, fontsize=16)
-        plt.savefig(filename, bbox_inches='tight', dpi=dpi)
+        plt.savefig(filename, bbox_inches='tight')
         plt.close()
 
-        self.status_label.config(text=f"Imágenes guardadas: {filename}")
+        self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
