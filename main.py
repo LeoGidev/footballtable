@@ -75,7 +75,7 @@ class FootballApp:
             local_scorers = self.get_scorers(row['Goleadores_local'])
             visit_scorers = self.get_scorers(row['Goleadores_visitante'])
             self.update_scorers(local_scorers, table_scorers)
-            self.update_scorers(visit_scorers, table_scorers)
+            self.update_scorers(visit_scorers)
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
@@ -83,9 +83,9 @@ class FootballApp:
         # Ordenar tabla de goleadores por goles (de mayor a menor)
         sorted_scorers = dict(sorted(table_scorers.items(), key=lambda item: item[1], reverse=True))
 
-        # Generar imágenes con fondo si se ha seleccionado
-        self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones.png")
-        self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores.png")
+        # Generar imágenes optimizadas para móvil
+        self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones_movil.png", mobile=True)
+        self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores_movil.png", mobile=True)
 
         messagebox.showinfo("Éxito", "Tablas generadas y guardadas como imágenes")
 
@@ -111,8 +111,16 @@ class FootballApp:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
 
-    def generate_image(self, title, table, filename):
-        fig, ax = plt.subplots()
+    def generate_image(self, title, table, filename, mobile=False):
+        # Ajustar el tamaño de la imagen dependiendo de si es para móvil o no
+        if mobile:
+            fig_width, fig_height = 6, 10  # Dimensiones optimizadas para pantalla de móvil (720x1280 px aproximadamente)
+            dpi = 150  # DPI adecuado para alta calidad en móviles
+        else:
+            fig_width, fig_height = 10, 8  # Tamaño estándar
+            dpi = 300  # Alta resolución para pantallas grandes
+
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
 
         if title == "Tabla de Posiciones":
             data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
@@ -124,8 +132,8 @@ class FootballApp:
         # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
         if self.background_image:
             # Convertir la imagen de fondo para que coincida con el tamaño de la figura
-            fig_width, fig_height = fig.get_size_inches() * fig.dpi
-            bg_image_resized = self.background_image.resize((int(fig_width), int(fig_height)))
+            fig_width_px, fig_height_px = fig.get_size_inches() * fig.dpi
+            bg_image_resized = self.background_image.resize((int(fig_width_px), int(fig_height_px)))
             ax.imshow(bg_image_resized, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)  # Colocar imagen de fondo
 
         # Crear tabla visual con matplotlib
@@ -133,12 +141,12 @@ class FootballApp:
         ax.axis('off')
         ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
 
-        # Guardar la imagen
+        # Guardar la imagen optimizada
         plt.title(title, fontsize=16)
-        plt.savefig(filename, bbox_inches='tight', dpi=300)
+        plt.savefig(filename, bbox_inches='tight', dpi=dpi)
         plt.close()
 
-        self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
+        self.status_label.config(text=f"Imágenes guardadas: {filename}")
 
 if __name__ == "__main__":
     root = tk.Tk()
