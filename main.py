@@ -48,50 +48,54 @@ class FootballApp:
             messagebox.showinfo("Imagen cargada", "Imagen de fondo seleccionada correctamente")
             self.status_label.config(text="Imagen seleccionada: " + os.path.basename(image_path))
 
-    def generate_table(self):
-        if self.data is None:
-            messagebox.showwarning("Error", "Debes cargar un archivo Excel primero")
-            return
+    def generate_image(self, title, table, filename):
+        # Tamaño fijo para móviles (720x1280)
+        fig, ax = plt.subplots(figsize=(7.2, 12.8))  # Tamaño optimizado para pantallas móviles
 
-        table_positions = {}
-        table_scorers = {}
+        # Cargar la imagen de fondo
+        if self.bg_image_path:
+            img = Image.open(self.bg_image_path)
+            ax.imshow(img, extent=[0, 7.2, 0, 12.8], aspect='auto')  # Ajuste la imagen al tamaño del gráfico
 
-        for index, row in self.data.iterrows():
-            local_team = row['Equipo_local']
-            visit_team = row['Equipo_visitante']
-            local_goals = row['Goles_local']
-            visit_goals = row['Goles_visitante']
+        # Datos y columnas para la tabla
+        if title == "Tabla de Posiciones":
+            data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
+            columns = ["Equipo", "Puntos", "Goles a favor", "Goles en contra", "Partidos"]
 
-            if local_goals > visit_goals:
-                self.update_table(local_team, 3, local_goals, visit_goals, table_positions)
-                self.update_table(visit_team, 0, visit_goals, local_goals, table_positions)
-            elif local_goals < visit_goals:
-                self.update_table(local_team, 0, local_goals, visit_goals, table_positions)
-                self.update_table(visit_team, 3, visit_goals, local_goals, table_positions)
-            else:
-                self.update_table(local_team, 1, local_goals, visit_goals, table_positions)
-                self.update_table(visit_team, 1, visit_goals, local_goals, table_positions)
+            # Anchos de las columnas basados en el contenido (ajuste manual)
+            col_widths = [0.4, 0.2, 0.15, 0.15, 0.2]  
+        else:
+            data = [(scorer, goals) for scorer, goals in table.items()]
+            columns = ["Goleador", "Goles"]
 
-            local_scorers = self.get_scorers(row['Goleadores_local'])
-            visit_scorers = self.get_scorers(row['Goleadores_visitante'])
-            # Línea 77:
-            self.update_scorers(local_scorers, table_scorers)
+            # Anchos de las columnas para la tabla de goleadores
+            col_widths = [0.7, 0.3]  
 
-            # Línea 78:
-            self.update_scorers(visit_scorers, table_scorers)
+        # Crear la tabla visual con matplotlib
+        ax.axis('tight')
+        ax.axis('off')
 
+        # Crear la tabla con el ancho de las columnas ajustado
+        table_plot = ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center', colWidths=col_widths)
 
-        # Ordenar tabla de posiciones por puntos (de mayor a menor)
-        sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
+        # Ajustes de estilo: tamaño de la fuente, padding y tamaño de la fila
+        table_plot.auto_set_font_size(False)
+        table_plot.set_fontsize(12)  # Tamaño de fuente fijo para móviles
+        table_plot.scale(1, 1.5)  # Escala fija para móviles
 
-        # Ordenar tabla de goleadores por goles (de mayor a menor)
-        sorted_scorers = dict(sorted(table_scorers.items(), key=lambda item: item[1], reverse=True))
+        # Aplicar bordes y formato a las celdas
+        for key, cell in table_plot.get_celld().items():
+            cell.set_edgecolor("black")  # Color de borde
+            cell.set_linewidth(1.5)      # Grosor de los bordes
+            cell.set_aa(True)            # Suavizado de bordes
 
-        # Generar imágenes optimizadas para móvil
-        self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones_movil.png", mobile=True)
-        self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores_movil.png", mobile=True)
+        # Título y guardar la imagen con el tamaño fijo
+        plt.title(title, fontsize=16)
+        plt.savefig(filename, bbox_inches='tight')
+        plt.close()
 
-        messagebox.showinfo("Éxito", "Tablas generadas y guardadas como imágenes")
+        self.status_label.config(text=f"Imagen guardada: {filename}")
+
 
     def get_scorers(self, scorers_cell):
         if pd.isna(scorers_cell):
