@@ -115,21 +115,21 @@ class FootballApp:
                     table_scorers[scorer] = 0
                 table_scorers[scorer] += 1
 
-    def generate_image(self, title, table, filename):
-        fig, ax = plt.subplots()
+    def generate_image(self, title, table, filename, mobile=False):
+        fig, ax = plt.subplots(figsize=(6, 4) if mobile else (10, 6))  # Ajuste de tamaño para móvil o estándar
 
         if title == "Tabla de Posiciones":
             data = [(team, stats['Puntos'], stats['Goles a favor'], stats['Goles en contra'], stats['Partidos']) for team, stats in table.items()]
             columns = ["Equipo", "Puntos", "Goles a favor", "Goles en contra", "Partidos"]
 
             # Definir anchos de columnas (basado en el contenido)
-            col_widths = [0.3, 0.1, 0.15, 0.15, 0.1]
+            col_widths = [0.3, 0.1, 0.15, 0.15, 0.1] if not mobile else [0.4, 0.2, 0.2, 0.2, 0.2]  # Ajustes para móvil
         else:
             data = [(scorer, goals) for scorer, goals in table.items()]
             columns = ["Goleador", "Goles"]
 
             # Definir anchos de columnas para goleadores
-            col_widths = [0.6, 0.2]
+            col_widths = [0.6, 0.2] if not mobile else [0.7, 0.3]  # Ajustes para móvil
 
         # Crear tabla visual con matplotlib
         ax.axis('tight')
@@ -140,21 +140,22 @@ class FootballApp:
 
         # Estilo de la tabla: ajustar el alto de las filas y agregar padding
         table_plot.auto_set_font_size(False)
-        table_plot.set_fontsize(12)  # Tamaño de la fuente
-        table_plot.scale(1, 1.5)     # Escalar altura de las filas (1.5 aumenta el alto)
+        table_plot.set_fontsize(10 if mobile else 12)  # Tamaño de la fuente, menor en móviles
+        table_plot.scale(1, 1.5 if not mobile else 1.2)  # Escalar altura de las filas, ajustada para móvil
 
         # Aplicar padding a las celdas y ajustar el diseño
         for key, cell in table_plot.get_celld().items():
             cell.set_edgecolor("black")  # Color de borde
             cell.set_linewidth(1.5)      # Grosor de los bordes
-            cell.set_pad(10)             # Padding interno de las celdas
-        
+            cell.set_pad(8 if mobile else 10)  # Padding, menor en móviles
+
         # Guardar la imagen con ajustes
-        plt.title(title, fontsize=16)
+        plt.title(title, fontsize=14 if mobile else 16)
         plt.savefig(filename, bbox_inches='tight')
         plt.close()
 
-        self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
+        self.status_label.config(text=f"Imágenes guardadas: posiciones_movil.png, goleadores_movil.png")
+
 
 
 if __name__ == "__main__":
