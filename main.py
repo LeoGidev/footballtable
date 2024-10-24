@@ -142,14 +142,31 @@ class FootballApp:
         # Crear tabla visual con matplotlib
         ax.axis('tight')
         ax.axis('off')
-        ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
 
-        # Guardar la imagen optimizada
+        # Calcular el ancho máximo de cada columna
+        column_widths = [max(len(str(item)) for item in [col] + [row[i] for row in data]) for i, col in enumerate(columns)]
+        # Ajustar el tamaño de las columnas
+        cell_widths = [width * 0.2 for width in column_widths]  # Ajustar el factor según la visualización deseada
+
+        # Establecer el alto de las filas
+        cell_height = 0.5  # Ajustar según sea necesario
+
+        table = ax.table(cellText=data, colLabels=columns, cellLoc='center', loc='center')
+        
+        # Ajustar el ancho y alto de cada celda
+        for i, width in enumerate(cell_widths):
+            table.auto_set_column_width(i)
+            table[i, 0].set_width(width * 0.1)  # Ajustar ancho (0.1 es un factor que puedes modificar)
+
+        for i in range(len(data)):
+            table[(i + 1, 0)].set_height(cell_height)  # Establecer alto para cada fila
+
         plt.title(title, fontsize=16)
         plt.savefig(filename, bbox_inches='tight', dpi=dpi)
         plt.close()
 
         self.status_label.config(text=f"Imágenes guardadas: {filename}")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
