@@ -74,8 +74,12 @@ class FootballApp:
 
             local_scorers = self.get_scorers(row['Goleadores_local'])
             visit_scorers = self.get_scorers(row['Goleadores_visitante'])
+            # Línea 77:
             self.update_scorers(local_scorers, table_scorers)
-            self.update_scorers(visit_scorers)
+
+            # Línea 78:
+            self.update_scorers(visit_scorers, table_scorers)
+
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
