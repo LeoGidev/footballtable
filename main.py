@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from openpyxl import load_workbook
 import matplotlib.pyplot as plt
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 import os
 
 class FootballApp:
@@ -21,6 +21,9 @@ class FootballApp:
         self.upload_button = ttk.Button(self.root, text="Cargar archivo Excel", command=self.upload_file)
         self.upload_button.pack(pady=10)
         
+        self.select_image_button = ttk.Button(self.root, text="Seleccionar imagen de fondo", command=self.select_background_image)
+        self.select_image_button.pack(pady=10)
+        
         self.generate_button = ttk.Button(self.root, text="Generar tablas e imágenes", command=self.generate_table)
         self.generate_button.pack(pady=10)
 
@@ -28,6 +31,7 @@ class FootballApp:
         self.status_label.pack(pady=20)
         
         self.file_path = None
+        self.background_image = None  # Para almacenar la imagen de fondo
         self.data = None
 
     def upload_file(self):
@@ -37,8 +41,8 @@ class FootballApp:
             messagebox.showinfo("Cargado", "Archivo cargado correctamente")
             self.status_label.config(text="Archivo cargado: " + os.path.basename(self.file_path))
 
-     def select_background_image(self):
-         image_path = filedialog.askopenfilename(title="Selecciona una imagen de fondo", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+    def select_background_image(self):
+        image_path = filedialog.askopenfilename(title="Selecciona una imagen de fondo", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
         if image_path:
             self.background_image = Image.open(image_path)
             messagebox.showinfo("Imagen cargada", "Imagen de fondo seleccionada correctamente")
@@ -72,13 +76,6 @@ class FootballApp:
             visit_scorers = self.get_scorers(row['Goleadores_visitante'])
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
-         # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
-        if self.background_image:
-            # Convertir la imagen de fondo para que coincida con el tamaño de la figura
-            fig_width, fig_height = fig.get_size_inches() * fig.dpi
-            bg_image_resized = self.background_image.resize((int(fig_width), int(fig_height)))
-            ax.imshow(bg_image_resized, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)  # Colocar imagen de fondo
-
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
@@ -86,7 +83,7 @@ class FootballApp:
         # Ordenar tabla de goleadores por goles (de mayor a menor)
         sorted_scorers = dict(sorted(table_scorers.items(), key=lambda item: item[1], reverse=True))
 
-        # Generar imágenes
+        # Generar imágenes con fondo si se ha seleccionado
         self.generate_image("Tabla de Posiciones", sorted_positions, "posiciones.png")
         self.generate_image("Tabla de Goleadores", sorted_scorers, "goleadores.png")
 
@@ -124,6 +121,13 @@ class FootballApp:
             data = [(scorer, goals) for scorer, goals in table.items()]
             columns = ["Goleador", "Goles"]
 
+        # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
+        if self.background_image:
+            # Convertir la imagen de fondo para que coincida con el tamaño de la figura
+            fig_width, fig_height = fig.get_size_inches() * fig.dpi
+            bg_image_resized = self.background_image.resize((int(fig_width), int(fig_height)))
+            ax.imshow(bg_image_resized, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)  # Colocar imagen de fondo
+
         # Crear tabla visual con matplotlib
         ax.axis('tight')
         ax.axis('off')
@@ -131,7 +135,7 @@ class FootballApp:
 
         # Guardar la imagen
         plt.title(title, fontsize=16)
-        plt.savefig(filename, bbox_inches='tight')
+        plt.savefig(filename, bbox_inches='tight', dpi=300)
         plt.close()
 
         self.status_label.config(text=f"Imágenes guardadas: posiciones.png, goleadores.png")
@@ -140,6 +144,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FootballApp(root)
     root.mainloop()
+
 
 
 
