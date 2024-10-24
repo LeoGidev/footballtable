@@ -39,7 +39,10 @@ class FootballApp:
 
      def select_background_image(self):
          image_path = filedialog.askopenfilename(title="Selecciona una imagen de fondo", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-        
+        if image_path:
+            self.background_image = Image.open(image_path)
+            messagebox.showinfo("Imagen cargada", "Imagen de fondo seleccionada correctamente")
+            
 
     def generate_table(self):
         if self.data is None:
