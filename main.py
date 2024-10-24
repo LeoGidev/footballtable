@@ -38,6 +38,8 @@ class FootballApp:
             self.status_label.config(text="Archivo cargado: " + os.path.basename(self.file_path))
 
      def select_background_image(self):
+         image_path = filedialog.askopenfilename(title="Selecciona una imagen de fondo", filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+        
 
     def generate_table(self):
         if self.data is None:
