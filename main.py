@@ -42,7 +42,7 @@ class FootballApp:
         if image_path:
             self.background_image = Image.open(image_path)
             messagebox.showinfo("Imagen cargada", "Imagen de fondo seleccionada correctamente")
-            
+            self.status_label.config(text="Imagen seleccionada: " + os.path.basename(image_path))
 
     def generate_table(self):
         if self.data is None:
@@ -72,6 +72,8 @@ class FootballApp:
             visit_scorers = self.get_scorers(row['Goleadores_visitante'])
             self.update_scorers(local_scorers, table_scorers)
             self.update_scorers(visit_scorers, table_scorers)
+         # Si hay una imagen de fondo seleccionada, ponerla en el fondo de la tabla
+        if self.background_image:
 
         # Ordenar tabla de posiciones por puntos (de mayor a menor)
         sorted_positions = dict(sorted(table_positions.items(), key=lambda item: item[1]['Puntos'], reverse=True))
