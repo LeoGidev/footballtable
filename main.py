@@ -158,7 +158,7 @@ class FootballApp:
             table[i, 0].set_width(width * 0.1)  # Ajustar ancho (0.1 es un factor que puedes modificar)
 
         #for i in range(len(data)):
-            #table[(i + 1, 0)].set_height(cell_height)  # Establecer alto para cada fila
+        table[(0, 0)].set_height(cell_height)  # Establecer alto para cada fila
 
         plt.title(title, fontsize=16)
         plt.savefig(filename, bbox_inches='tight', dpi=dpi)
